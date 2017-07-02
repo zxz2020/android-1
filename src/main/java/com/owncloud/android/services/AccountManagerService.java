@@ -1,32 +1,23 @@
 package com.owncloud.android.services;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.owncloud.android.MainApp;
 import com.owncloud.android.authentication.AccountUtils;
 import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.OwnCloudClientManagerFactory;
-import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 import com.owncloud.android.ui.activity.FileDisplayActivity;
 import com.owncloud.android.ui.asynctasks.AsyncTaskHelper;
 
-import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -38,13 +29,13 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import de.luhmer.owncloud.accountimporter.helper.InputStreamBinder;
 import de.luhmer.owncloud.accountimporter.helper.NextcloudRequest;
 
 public class AccountManagerService extends Service {
@@ -52,6 +43,11 @@ public class AccountManagerService extends Service {
     private static final String TAG = AccountManagerService.class.getCanonicalName();
 
     public AccountManagerService() { }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return (new InputStreamBinder(this));
+    }
 
     /** Command to the service to display a message */
     private static final int MSG_CREATE_NEW_ACCOUNT = 3;
@@ -270,21 +266,6 @@ public class AccountManagerService extends Service {
         public Object handlePutRequest(PutMethod put) throws IOException {
             return true;
         }
-    }
-
-    /**
-     * Target we publish for clients to send messages to IncomingHandler.
-     */
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
-
-    /**
-     * When binding to the service, we return an interface to our messenger
-     * for sending messages to the service.
-     */
-    @Override
-    public IBinder onBind(Intent intent) {
-        Toast.makeText(getApplicationContext(), "binding", Toast.LENGTH_SHORT).show();
-        return mMessenger.getBinder();
     }
 
 
