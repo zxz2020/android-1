@@ -101,7 +101,6 @@ import com.owncloud.android.ui.preview.PreviewMediaFragment;
 import com.owncloud.android.ui.preview.PreviewTextFragment;
 import com.owncloud.android.ui.preview.PreviewVideoActivity;
 import com.owncloud.android.utils.DataHolderUtil;
-import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.ErrorMessageAdapter;
 import com.owncloud.android.utils.MimeTypeUtil;
 import com.owncloud.android.utils.PermissionUtil;
@@ -1728,17 +1727,12 @@ public class FileDisplayActivity extends HookActivity
 
     public void setMediaServiceConnection() {
         mMediaServiceConnection = newMediaConnection();// mediaServiceConnection;
-        if (mMediaServiceConnection != null) {
-            bindService(new Intent(this, MediaService.class), mMediaServiceConnection,
-                    Context.BIND_AUTO_CREATE);
-        }
+        bindService(new Intent(this, MediaService.class), mMediaServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
-    private void tryStopPlaying(OCFile file){
-        if (mMediaServiceConnection != null && MimeTypeUtil.isAudio(file)){
-            if (mMediaServiceBinder.isPlaying(file)){
-                mMediaServiceBinder.pause();
-            }
+    private void tryStopPlaying(OCFile file) {
+        if (mMediaServiceConnection != null && MimeTypeUtil.isAudio(file) && mMediaServiceBinder.isPlaying(file)) {
+            mMediaServiceBinder.pause();
         }
     }
 
